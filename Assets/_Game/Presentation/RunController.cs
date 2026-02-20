@@ -2,15 +2,20 @@ using UnityEngine;
 
 public class RunController : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    private GameStateMachine _stateMachine;
+
+    private void Awake()
     {
-        
+        _stateMachine = new GameStateMachine();
     }
 
-    // Update is called once per frame
-    void Update()
+    private void Start()
     {
-        
+        _stateMachine.ChangeState(new CombatState());
+    }
+
+    private void Update()
+    {
+        _stateMachine.Tick();
     }
 }
