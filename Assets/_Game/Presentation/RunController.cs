@@ -16,6 +16,6 @@ public class RunController : MonoBehaviour
 
     private void Update()
     {
-        _stateMachine.Tick();
+        _stateMachine.Tick();   
     }
 }

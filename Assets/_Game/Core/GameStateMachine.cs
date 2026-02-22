@@ -6,7 +6,7 @@ public class GameStateMachine
     {
         _currentState?.Exit();
         _currentState = newState;
-        _currentState.Enter();
+        _currentState.Enter(ChangeState);
     }
 
     public void Tick()

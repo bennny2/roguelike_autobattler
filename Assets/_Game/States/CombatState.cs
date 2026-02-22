@@ -1,36 +1,34 @@
 using UnityEngine;
+using System;
 
 public class CombatState : IGameState
 {
-    public int health = 100;
-    private float _attackTimer = 0f;
-    private float _attackDelay = 1f; // 1 second delay between attacks
+    private Action<IGameState> _onStateChange;
+    private BattleSimulation _battle;
 
-    public void Enter()
+    public CombatState()
     {
-        Debug.Log("Combat started");
     }
 
-    public void Exit()
+    public void Enter(Action<IGameState> onStateChange)
     {
-        Debug.Log("Combat ended");
+        _onStateChange = onStateChange;
+        _battle = new BattleSimulation();
+        _battle.StartBattle();
     }
 
     public void Tick()
     {
-        if (health <= 0)
+        _battle.Step(Time.deltaTime);
+
+        if (_battle.IsFinished)
         {
-            Debug.Log("Combat ended - player defeated");
-            return;
+            _onStateChange(new ShopState());
         }
-        
-        _attackTimer += Time.deltaTime;
-        
-        if (_attackTimer >= _attackDelay)
-        {
-            Debug.Log($"Combat ticking - health = {health}");
-            health -= 10;
-            _attackTimer = 0f; // Reset timer
-        }
+    }
+
+    public void Exit()
+    {
+        // Cleanup visuals if needed
     }
 }
