@@ -7,6 +7,9 @@ public class BattleSimulation
     private float _attackDelay = 1f; // 1 second delay between attacks
     public bool IsFinished { get; private set; } = false;
 
+    public BattleSimulation(RunModel run)
+    {}
+
     public void StartBattle()
     {
         Debug.Log("Battle started!");
