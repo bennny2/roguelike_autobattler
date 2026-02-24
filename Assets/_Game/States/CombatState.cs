@@ -13,7 +13,7 @@ public class CombatState : IGameState
     public void Enter(Action<IGameState> onStateChange)
     {
         _onStateChange = onStateChange;
-        _battle = new BattleSimulation();
+        _battle = new BattleSimulation(RunManager.CurrentRun);
         _battle.StartBattle();
     }
 
