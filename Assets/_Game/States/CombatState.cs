@@ -5,6 +5,7 @@ public class CombatState : IGameState
 {
     private Action<IGameState> _onStateChange;
     private BattleSimulation _battle;
+    private RunModel CurrentRun { get; set; }
 
     public CombatState()
     {
@@ -13,8 +14,9 @@ public class CombatState : IGameState
     public void Enter(Action<IGameState> onStateChange)
     {
         _onStateChange = onStateChange;
-        _battle = new BattleSimulation(RunManager.CurrentRun);
-        _battle.StartBattle();
+        CurrentRun = RunManager.GetRun();
+        _battle = new BattleSimulation(CurrentRun);
+        _battle.StartBattle();  
     }
 
     public void Tick()

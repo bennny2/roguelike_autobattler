@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class RunController : MonoBehaviour
@@ -10,6 +11,7 @@ public class RunController : MonoBehaviour
 
         var run = new RunModel
         {
+            Id = Guid.NewGuid(),
             PlayerHealth = 100,
             PlayerMoney = 50
         };
@@ -19,7 +21,7 @@ public class RunController : MonoBehaviour
 
     private void Start()
     {
-        _stateMachine.ChangeState(new CombatState());
+        _stateMachine.ChangeState(new PlanningState());
     }
 
     private void Update()

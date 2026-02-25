@@ -6,4 +6,9 @@ public static class RunManager
     {
         CurrentRun = run;
     }
+
+    public static RunModel GetRun()
+    {
+        return CurrentRun;
+    }
 }
