@@ -7,6 +7,7 @@ public class RunModel
     public int PlayerHealth { get; set; }
     public int PlayerMoney { get; set; }
     public List<UnitModel> PlayerUnits { get; set; }
+    public List<UnitModel> EnemyUnits { get; set; }
 
     public RunModel(){}
 
