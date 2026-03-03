@@ -22,9 +22,9 @@ public class UnitModel
     public float AttackSpeed { get; set; } = 1f;
     public float AttackSpeedForCurrentCombat { get; set; }
 
-    public float CriticalStrikeChance { get; set; }
+    public float CriticalStrikeChance { get; set; } = 0.25f;
     public float CriticalStrikeChanceForCurrentCombat { get; set; }
-    public float CriticalStrikeDamage { get; set; }
+    public float CriticalStrikeDamage { get; set; } = 1.5f;
     public float CriticalStrikeDamageForCurrentCombat { get; set; }
 
     public int AbilityPower { get; set; }
@@ -32,9 +32,9 @@ public class UnitModel
 
     public float AbilityModifier { get; set; } = 1f;
 
-    public int Armor { get; set; }
+    public int Armor { get; set; } = 20;
     public int ArmorForCurrentCombat { get; set; }
-    public int MagicResist { get; set; }
+    public int MagicResist { get; set; } = 20;
     public int MagicResistForCurrentCombat { get; set; }
 
     public int GoldCost { get; set; }

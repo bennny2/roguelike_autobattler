@@ -17,7 +17,8 @@ public class PlanningState : IGameState
         {
             new() {
                 Name = "Goblin",
-                CurrentHealth = 30,
+                MaxHealth = 30,
+                MaxMana = 0,
                 AttackDamage = 3,
                 AttackSpeed = 1.5f,
                 AttackTimer = 1.5f,
@@ -26,7 +27,8 @@ public class PlanningState : IGameState
             new()
             {
                 Name = "Orc",
-                CurrentHealth = 50,
+                MaxHealth = 50,
+                MaxMana = 0,
                 AttackDamage = 7,
                 AttackSpeed = 2f,
                 AttackTimer = 2f,
@@ -38,7 +40,8 @@ public class PlanningState : IGameState
         CurrentRun.AddUnitToTeam(new UnitModel 
         { 
             Name = "Warrior", 
-            CurrentHealth = 50, 
+            MaxHealth = 50, 
+            MaxMana = 0,
             AttackDamage = 5,
             AttackSpeed = 1f,
             AttackTimer = 1f,
