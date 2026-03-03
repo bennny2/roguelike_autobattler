@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.InputSystem.Utilities;
 
 public class BattleSimulation
 {
@@ -105,7 +106,12 @@ public class BattleSimulation
         // Can attack?
         if (unit.AttackTimer >= unit.AttackSpeed)
         {
-            AttackResolver.ResolveAttack(unit, unit.Target);
+            var attack = new Attack(
+                Name: "Auto Attack",
+                DamageType: DamageType.Physical,
+                AttackType: AttackType.InstantDamage
+            ); 
+            AttackResolver.ResolveAttack(unit, unit.Target, attack);
             unit.AttackTimer = 0f;
         }
     }
