@@ -17,18 +17,18 @@ public class PlanningState : IGameState
         {
             new() {
                 Name = "Goblin",
-                Health = 30,
-                Attack = 3,
-                AttackDelay = 1.5f,
+                CurrentHealth = 30,
+                AttackDamage = 3,
+                AttackSpeed = 1.5f,
                 AttackTimer = 1.5f,
                 IsPlayerUnit = false
             },
             new()
             {
                 Name = "Orc",
-                Health = 50,
-                Attack = 7,
-                AttackDelay = 2f,
+                CurrentHealth = 50,
+                AttackDamage = 7,
+                AttackSpeed = 2f,
                 AttackTimer = 2f,
                 IsPlayerUnit = false
             }
@@ -38,9 +38,9 @@ public class PlanningState : IGameState
         CurrentRun.AddUnitToTeam(new UnitModel 
         { 
             Name = "Warrior", 
-            Health = 50, 
-            Attack = 5,
-            AttackDelay = 1f,
+            CurrentHealth = 50, 
+            AttackDamage = 5,
+            AttackSpeed = 1f,
             AttackTimer = 1f,
             IsPlayerUnit = true
         });

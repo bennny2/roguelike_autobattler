@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
 public class BattleSimulation
@@ -18,38 +20,71 @@ public class BattleSimulation
     public void StartBattle()
     {
         Debug.Log("Battle started!");
-        // Initialize battle state, load characters, etc.
 
         UnitsInCombat.AddRange(Run.PlayerUnits);
         UnitsInCombat.AddRange(Run.EnemyUnits);
+
+        ResetUnits(UnitsInCombat);
+        // Apply items
+        // Apply trait effects
+        // Apply augments
+    }
+
+    private void ResetUnits(List<UnitModel> unitsInCombat)
+    {
+        foreach (var unit in unitsInCombat)
+        {
+            unit.CurrentHealth = unit.MaxHealthForCurrentCombat = unit.MaxHealth;
+            unit.CurrentMana = unit.MaxManaForCurrentCombat = unit.MaxMana;
+            unit.AttackDamageForCurrentCombat = unit.AttackDamage;
+            unit.AttackSpeedForCurrentCombat = unit.AttackSpeed;
+            unit.CriticalStrikeChanceForCurrentCombat = unit.CriticalStrikeChance;
+            unit.CriticalStrikeDamageForCurrentCombat = unit.CriticalStrikeDamage; 
+            unit.AbilityPowerForCurrentCombat = unit.AbilityPower;
+            unit.ArmorForCurrentCombat = unit.Armor;
+            unit.MagicResistForCurrentCombat = unit.MagicResist;
+            unit.AttackTimer = 0f;
+            unit.Target = null;
+        }
     }
 
     public void Step(float deltaTime)
     {
-        // End the fight if all player units are defeated
-        if (Run.PlayerUnits.TrueForAll(u => u.Health <= 0))
+        // End the fight if all units are defeated
+        if (CheckBattleOutcome())
         {
-            Debug.Log("Combat ended - units defeated");
-            IsFinished = true;
-            PlayerWonBattle = false;
             return;
         }
-        if (Run.EnemyUnits.TrueForAll(u => u.Health <= 0))
-        {
-            Debug.Log("Combat ended - enemies defeated");
-            IsFinished = true;
-            PlayerWonBattle = true;
-            return;
-        }
+
+        // Process trait effects
 
         // Process units actions
         foreach (var unit in UnitsInCombat)
         {
-            if (unit.Health > 0)
+            if (unit.CurrentHealth > 0)
             {
                 ProcessUnitAction(unit, deltaTime);
             }
         }
+    }
+
+    private bool CheckBattleOutcome()
+    {
+        if (Run.PlayerUnits.TrueForAll(u => u.CurrentHealth <= 0))
+        {
+            Debug.Log("Combat ended - units defeated");
+            IsFinished = true;
+            PlayerWonBattle = false;
+            return true;
+        }
+        else if (Run.EnemyUnits.TrueForAll(u => u.CurrentHealth <= 0))
+        {
+            Debug.Log("Combat ended - enemies defeated");
+            IsFinished = true;
+            PlayerWonBattle = true;
+            return true;
+        }
+        return false;
     }
 
     private void ProcessUnitAction(UnitModel unit, float deltaTime)
@@ -57,9 +92,9 @@ public class BattleSimulation
         unit.AttackTimer += deltaTime;
 
         // Has target?
-        if (unit.Target == null || unit.Target.Health <= 0)
+        if (unit.Target == null || unit.Target.CurrentHealth <= 0)
         {
-            var potentialTargets = UnitsInCombat.FindAll(u => u.IsPlayerUnit != unit.IsPlayerUnit && u.Health > 0);
+            var potentialTargets = UnitsInCombat.FindAll(u => u.IsPlayerUnit != unit.IsPlayerUnit && u.CurrentHealth > 0);
             unit.Target = TargetingSystem.SelectTarget(unit, potentialTargets);
         }
 
@@ -68,7 +103,7 @@ public class BattleSimulation
         // Can cast ability?
 
         // Can attack?
-        if (unit.AttackTimer >= unit.AttackDelay)
+        if (unit.AttackTimer >= unit.AttackSpeed)
         {
             AttackResolver.ResolveAttack(unit, unit.Target);
             unit.AttackTimer = 0f;
