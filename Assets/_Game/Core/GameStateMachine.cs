@@ -4,8 +4,13 @@ public class GameStateMachine
 
     public void ChangeState(IGameState newState)
     {
-        _currentState?.Exit();
+        if (_currentState != null)
+        {
+            _currentState.Exit();
+            GameEvents.RaiseStateExited(_currentState);
+        }
         _currentState = newState;
+        GameEvents.RaiseStateEntered(newState);
         _currentState.Enter(ChangeState);
     }
 

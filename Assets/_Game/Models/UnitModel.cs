@@ -4,7 +4,16 @@ public class UnitModel
 {
     public string Name { get; set; } = string.Empty;
 
-    public int CurrentHealth { get; set; }
+    private int _currentHealth;
+    public int CurrentHealth
+    {
+        get => _currentHealth;
+        set
+        {
+            int limit = MaxHealthForCurrentCombat > 0 ? MaxHealthForCurrentCombat : MaxHealth;
+            _currentHealth = value < 0 ? 0 : (value > limit ? limit : value);
+        }
+    }
     public int MaxHealthForCurrentCombat { get; set; }
     public int MaxHealth { get; set; }
 
@@ -44,4 +53,25 @@ public class UnitModel
     public UnitModel? Target { get; set; }
 
     public UnitModel(){}
+
+    public void TakeDamage(int amount, DamageType damageType, UnitModel? attacker = null, bool isCritical = false)
+    {
+        if (amount < 0) return;
+
+        CurrentHealth -= amount;
+
+        // Raise gameplay damage events
+        GameEvents.RaiseUnitDamaged(attacker, this, amount, isCritical, damageType);
+
+        if (CurrentHealth <= 0)
+        {
+            GameEvents.RaiseUnitDefeated(this);
+        }
+    }
+
+    public void Heal(int amount)
+    {
+        if (amount < 0) return;
+        CurrentHealth += amount;
+    }
 }

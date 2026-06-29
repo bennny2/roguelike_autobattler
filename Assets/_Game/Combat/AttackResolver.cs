@@ -10,53 +10,75 @@ public class AttackResolver
                 ResolveInstantDamageAttack(attacker, defender, attack);
                 break;
             case AttackType.Dot:
-                ResolveDamageOverTimeAttack(attacker, defender);
+                ResolveDamageOverTimeAttack(attacker, defender, attack);
                 break;
         }
     }
-    public void ResolveInstantDamageAttack(UnitModel attacker, UnitModel defender, Attack attack) // use interfaces
+
+    public void ResolveInstantDamageAttack(UnitModel attacker, UnitModel defender, Attack attack)
     {
         // Calculate base damage with items, traits, buffs, debuffs, etc.
         var damage = CalculateBaseDamage(attacker, defender);
 
-        // Critical hit?
-        damage = HandleCriticalHits(attacker, defender, damage);
+        // Determine if critical hit
+        bool isCritical = Random.value < attacker.CriticalStrikeChanceForCurrentCombat;
+        if (isCritical)
+        {
+            float critMultiplier = attacker.CriticalStrikeDamageForCurrentCombat > 0 
+                ? attacker.CriticalStrikeDamageForCurrentCombat 
+                : attacker.CriticalStrikeDamage;
+            damage *= critMultiplier;
+            Debug.Log("Critical hit!");
+        }
 
-        // Damage reduction from armor or magic resist?
-        var damageTaken = CalculateDamageAfterMitigation(attacker, defender, damage);
+        // Damage reduction from armor or magic resist based on DamageType
+        var damageTaken = CalculateDamageAfterMitigation(attacker, defender, damage, attack.DamageType);
 
         // Apply damage to defender
-        defender.CurrentHealth -= (int)damageTaken; // shuold deal damage thorugh setter on unit. also could be better
+        defender.TakeDamage((int)damageTaken, attack.DamageType, attacker, isCritical);
 
-        Debug.Log($"{attacker.Name} attacks {defender.Name} for {damage} damage. {defender.Name} has {defender.CurrentHealth} health left.");
+        Debug.Log($"{attacker.Name} attacks {defender.Name} for {(int)damageTaken} {attack.DamageType} damage. {defender.Name} has {defender.CurrentHealth} health left.");
     }
 
-    public void ResolveDamageOverTimeAttack(UnitModel attacker, UnitModel defender)
+    public void ResolveDamageOverTimeAttack(UnitModel attacker, UnitModel defender, Attack attack)
     {
-        // Similar to ResolveInstantDamageAttack but applies damage over multiple steps
+        // Apply single tick of damage over time
+        var baseDamage = CalculateBaseDamage(attacker, defender) * 0.2f; // DoT ticks represent 20% of base damage
+        var damageTaken = CalculateDamageAfterMitigation(attacker, defender, baseDamage, attack.DamageType);
+
+        defender.TakeDamage((int)damageTaken, attack.DamageType, attacker, isCritical: false);
+
+        Debug.Log($"{attacker.Name} deals {(int)damageTaken} {attack.DamageType} DoT damage to {defender.Name}. {defender.Name} has {defender.CurrentHealth} health left.");
     }
 
     private float CalculateBaseDamage(UnitModel attacker, UnitModel defender)
     {
-        // if defender is tank, maybe something (trait/item) makes it do more damage
         return attacker.AttackDamageForCurrentCombat;
     }
 
-    private float HandleCriticalHits(UnitModel attacker, UnitModel defender, float baseDamage)
+    private float CalculateDamageAfterMitigation(UnitModel attacker, UnitModel defender, float damage, DamageType damageType)
     {
-        if (Random.value < attacker.CriticalStrikeChanceForCurrentCombat)
+        float damageMitigation = 0f;
+        switch (damageType)
         {
-            Debug.Log("Critical hit!");
-            return baseDamage * attacker.CriticalStrikeDamage;
-
+            case DamageType.Physical:
+                damageMitigation = defender.ArmorForCurrentCombat;
+                break;
+            case DamageType.Magic:
+                damageMitigation = defender.MagicResistForCurrentCombat;
+                break;
+            case DamageType.True:
+                return damage; // True damage completely ignores mitigation
         }
-        return baseDamage;
-    }
 
-    private float CalculateDamageAfterMitigation(UnitModel attacker, UnitModel defender, float damage)
-    {
-        // Think about armor vs mr
-        var damageMitigation = defender.ArmorForCurrentCombat; // Placeholder, should consider attack type and defender's armor/mr
-        return damage * 100 / (100 + damageMitigation); // Placeholder, should consider attack type and defender's armor/mr
+        if (damageMitigation >= 0)
+        {
+            return damage * 100f / (100f + damageMitigation);
+        }
+        else
+        {
+            // Amplified damage for negative armor/MR
+            return damage * (2f - 100f / (100f - damageMitigation));
+        }
     }
 }

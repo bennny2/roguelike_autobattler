@@ -29,6 +29,8 @@ public class BattleSimulation
         // Apply items
         // Apply trait effects
         // Apply augments
+
+        GameEvents.RaiseCombatStarted();
     }
 
     private void ResetUnits(List<UnitModel> unitsInCombat)
@@ -76,6 +78,7 @@ public class BattleSimulation
             Debug.Log("Combat ended - units defeated");
             IsFinished = true;
             PlayerWonBattle = false;
+            GameEvents.RaiseCombatEnded(false);
             return true;
         }
         else if (Run.EnemyUnits.TrueForAll(u => u.CurrentHealth <= 0))
@@ -83,6 +86,7 @@ public class BattleSimulation
             Debug.Log("Combat ended - enemies defeated");
             IsFinished = true;
             PlayerWonBattle = true;
+            GameEvents.RaiseCombatEnded(true);
             return true;
         }
         return false;
